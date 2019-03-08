@@ -1,4 +1,4 @@
-# WebApiBenchmark
+# Web api benchmark
 ## 运行环境
 安装有`dotnet core 2.1`更高版本的linux或windows
 ## 运行
