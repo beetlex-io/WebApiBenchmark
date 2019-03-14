@@ -2,6 +2,9 @@
 说到WebApi管理和测试工具其实已经非常多的了，Postman、Swagger等在管理和维护上都非常出色；在性能测试方面也有不少的工具如:wrk,bombardier,http_load和ab等等。不过这些工具都具有单一性，管理和维护好的在性能测试上比较低效，对于性能测试好的在管理和维护上不理想！以下主要介绍一款基于`dotnet core`开发的`WebApiBenchmarks`工具，这个工具可以对webapi进行管理和维护并提供高效的性能测试能力，接下来来先预览一下这个小工具再进行详细介绍。
 
 ![](https://i.imgur.com/RPkWhzS.png)
+- 0.6.8
+调整测试用例树刷新问题，添加状态明细查看，修复测试后没有释放连接问题
+
 - 0.6
 添加明细百分比显示
 ![](https://i.imgur.com/b5cSS3Q.png)
