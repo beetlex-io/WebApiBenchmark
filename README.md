@@ -11,7 +11,7 @@
 
 添加明细百分比显示
 
-![](https://i.imgur.com/RPkWhzS.png)
+![](https://i.imgur.com/Di9A292.png)
 
 
 ## 功能
