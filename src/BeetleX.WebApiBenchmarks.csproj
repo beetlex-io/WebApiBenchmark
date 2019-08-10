@@ -1,0 +1,113 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <SignAssembly>false</SignAssembly>
+    <Version>0.8.7</Version>
+    <Authors>henryfan</Authors>
+    <Company>ikende.com</Company>
+    <Copyright>Copyright © ikende.com 2019 email:henryfan@msn.com</Copyright>
+    <Description>Web api benchmark tools</Description>
+    <LangVersion>7.3</LangVersion>
+    <AssemblyVersion>0.8.7.0</AssemblyVersion>
+    <FileVersion>0.8.7.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="views\css\bootstrap-theme.css" />
+    <None Remove="views\css\bootstrap.css" />
+    <None Remove="views\css\site.css" />
+    <None Remove="views\images\dd.png" />
+    <None Remove="views\images\delete.png" />
+    <None Remove="views\images\export.png" />
+    <None Remove="views\images\folder_close.png" />
+    <None Remove="views\images\folder_open.png" />
+    <None Remove="views\images\import.png" />
+    <None Remove="views\images\test.png" />
+    <None Remove="views\images\teststatus_default.png" />
+    <None Remove="views\images\teststatus_error.png" />
+    <None Remove="views\images\teststatus_ok.png" />
+    <None Remove="views\images\tree_down.png" />
+    <None Remove="views\images\tree_left.png" />
+    <None Remove="views\images\unittest.png" />
+    <None Remove="views\images\wx_pay.png" />
+    <None Remove="views\index.html" />
+    <None Remove="views\js\bootstrap.js" />
+    <None Remove="views\js\Controller.js" />
+    <None Remove="views\js\echarts.js" />
+    <None Remove="views\js\FastHttpApi.js" />
+    <None Remove="views\js\jquery.js" />
+    <None Remove="views\js\ModuleLoader.js" />
+    <None Remove="views\js\Monitor.js" />
+    <None Remove="views\js\ReadFileHandler.js" />
+    <None Remove="views\js\vue.js" />
+    <None Remove="views\PublicModule.html" />
+    <None Remove="views\images\new.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="views\css\bootstrap-theme.css" />
+    <EmbeddedResource Include="views\css\bootstrap.css" />
+    <EmbeddedResource Include="views\css\site.css" />
+    <EmbeddedResource Include="views\images\dd.png" />
+    <EmbeddedResource Include="views\images\delete.png" />
+    <EmbeddedResource Include="views\images\export.png" />
+    <EmbeddedResource Include="views\images\folder_close.png" />
+    <EmbeddedResource Include="views\images\folder_open.png" />
+    <EmbeddedResource Include="views\images\import.png" />
+    <EmbeddedResource Include="views\images\test.png" />
+    <EmbeddedResource Include="views\images\teststatus_default.png" />
+    <EmbeddedResource Include="views\images\teststatus_error.png" />
+    <EmbeddedResource Include="views\images\teststatus_ok.png" />
+    <EmbeddedResource Include="views\images\tree_down.png" />
+    <EmbeddedResource Include="views\images\tree_left.png" />
+    <EmbeddedResource Include="views\images\unittest.png" />
+    <EmbeddedResource Include="views\images\wx_pay.png" />
+    <EmbeddedResource Include="views\index.html" />
+    <EmbeddedResource Include="views\js\bootstrap.js" />
+    <EmbeddedResource Include="views\js\Controller.js" />
+    <EmbeddedResource Include="views\js\echarts.js" />
+    <EmbeddedResource Include="views\js\FastHttpApi.js" />
+    <EmbeddedResource Include="views\js\jquery.js" />
+    <EmbeddedResource Include="views\js\ModuleLoader.js" />
+    <EmbeddedResource Include="views\js\Monitor.js" />
+    <EmbeddedResource Include="views\js\ReadFileHandler.js" />
+    <EmbeddedResource Include="views\js\vue.js" />
+    <EmbeddedResource Include="views\PublicModule.html" />
+    <EmbeddedResource Include="views\images\new.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BeetleX.FastHttpApi" Version="1.5.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Codes\Controller.cs">
+      <Generator>JSAPI</Generator>
+      <LastGenOutput>Controller.js</LastGenOutput>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Codes\Controller.js">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Controller.cs</DependentUpon>
+    </None>
+    <None Update="HttpConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="webapibenchmark.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="webapibenchmark.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties HttpConfig_1json__JSONSchema="http://json.schemastore.org/bozr" /></VisualStudio></ProjectExtensions>
+
+</Project>

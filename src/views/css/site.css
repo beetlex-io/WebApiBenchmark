@@ -1,0 +1,85 @@
+﻿body {
+    background-color: #ffffff;
+}
+
+.navbar-inverse {
+    border: none;
+    box-shadow: 0px 0px 4px rgb(128, 128, 128);
+}
+
+.c-panel {
+    border-radius: 4px;
+    padding: 5px;
+    box-shadow: 0px 0px 4px rgb(128, 128, 128);
+    margin-bottom: 20px;
+}
+
+.c-panel-title {
+    font-size: 10pt;
+    margin: 2px;
+    padding: 5px;
+    color: #808080;
+    border-bottom-style: inset;
+    border-bottom-width: 1px;
+    border-bottom-color: #dcdcdc;
+}
+
+.tool-bar {
+    padding: 4px;
+    display: inline-flex;
+}
+
+    .tool-bar > input {
+        margin-right: 4px;
+        margin-top: 6px;
+    }
+
+    .tool-bar > select {
+        margin-right: 10px;
+    }
+
+    .tool-bar > a {
+        margin-left: 4px;
+        margin-right: 4px;
+        padding: 2px;
+        padding-top: 1px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #ffffff;
+        margin: auto;
+        height: 24px;
+    }
+
+        .tool-bar > a:hover {
+            border-style: solid;
+            border-width: 1px;
+            border-color: #dcdcdc;
+            box-shadow: 0px 0px 1px rgb(128, 128, 128);
+            border-radius: 4px;
+        }
+
+.lst-server {
+    list-style: none;
+    padding: 4px;
+    margin: 0px;
+    padding-left: 10px;
+}
+
+    .lst-server > li {
+        padding: 4px;
+    }
+
+.lst-cases {
+    padding: 4px;
+    margin: 0px;
+    padding-left: 10px;
+    list-style: none;
+}
+
+.leftspit {
+    padding-left: 3px;
+    margin-left: 3px;
+    border-left-color: #dcdcdc;
+    border-left-style: solid;
+    border-bottom-width: 1px;
+}

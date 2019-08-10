@@ -1,0 +1,946 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+
+    <link href="/css/bootstrap.css" rel="stylesheet" />
+    <link href="/css/bootstrap-theme.css" rel="stylesheet" />
+    <link href="/css/site.css" rel="stylesheet" />
+    <script src="/js/jquery.js"></script>
+    <script src="/js/vue.js"></script>
+    <script src="/js/ModuleLoader.js"></script>
+    <script src="/js/FastHttpApi.js"></script>
+    <script src="/js/Monitor.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/js/Controller.js"></script>
+    <script src="/js/echarts.js"></script>
+    <script src="/js/ReadFileHandler.js"></script>
+    <title>BeetleX Web api benchmarks</title>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container" slot="header">
+
+        </div>
+    </div>
+    <div class="container bs-docs-container" style="padding-top:60px;">
+        <!--<ul class="nav nav-tabs" slot="admin-manager-nav"></ul>-->
+        <div class="row">
+            <div id="top_frame" style="height:100px;padding-bottom:10px;">
+                <a href="javascript:void(0)" onclick="$('#top_frame').hide()" style="position:absolute;z-index:3000;margin-left:-50px;" class="btn btn-sm">
+                    <span class="label label-success">
+                        关闭
+                    </span>
+                </a>
+                <iframe src="http://www.ikende.com/toppanel.html" style="border:none;overflow:no-display;width:100%;height:100%" scrolling="no"></iframe>
+
+            </div>
+            <div class="col-md-4 col">
+                <div class="c-panel" id="lstServer">
+                    <h3 class="c-panel-title">服务地址</h3>
+                    <div class="tool-bar">
+                        <input type="text" style="width: 250px;" v-model:value="newServer" title="服务地址" class="form-control input-sm" />
+                        <a href="javascript:void(0)" @click="create" style="margin-top:10px;" title="新建"><img src="/images/new.png" /></a>
+
+                    </div>
+                    <ul class="lst-server">
+                        <li v-for="(item,i) in Items" style="display:inline-block;padding:0px;">
+                            <input type="radio" :id="[i+'_radio']" name="selectServer" @change="select=item" />
+                            <label :for="[i+'_radio']" style="padding:0px;margin:0px;cursor:pointer;">{{item}}</label>
+
+                            <div class="tool-bar">
+                                <a href="javascript:void(0)" @click="del(item)" title="删除"><img src="/images/delete.png" /></a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="c-panel" id="lstCases">
+                    <h3 class="c-panel-title">测试用例</h3>
+
+                    <div class="tool-bar">
+                        <a href="javascript:void(0)" style="margin-top:5px;" @click="create" title="新建"><img src="/images/new.png" /></a>
+                        <a href="javascript:void(0)" class="leftspit" style="margin-top:5px;" @click="unitTest" title="单元测试"><img src="/images/unittest.png" /></a>
+                        <a href="javascript:void(0)" style="margin-top:5px;" @click="test" title="压力测试"><img src="/images/test.png" /></a>
+                        <a href="javascript:void(0)" onclick=" $('#importFile').val('');$('#importFile').trigger('click');" class="leftspit" style="margin-top:5px;" title="导入"><img src="/images/import.png" /></a>
+                        <a href="/Download" style="margin-top:5px;" title="导出" target="_blank"><img src="/images/export.png" /></a>
+                        <input id="importFile" type="file" style="display:none" multiple />
+                    </div>
+                    <select title="分类" @change="list" v-model:value="SelectCategory" class="form-control input-sm">
+                        <option value=""></option>
+                        <option v-for="item in Categories" @value="item.Key">{{item.Key}}</option>
+                    </select>
+                    <ul class="lst-cases">
+                        <li v-for="item in Items">
+                            <input type="checkbox" v-model:value="item.Selected" @change="categorySelect(item)" />
+                            <a href="javascript:void(0)" @click="item.Show=!item.Show" style="margin-top:-4px;">
+                                <img v-if="item.Show" src="/images/folder_open.png" />
+                                <img v-else src="/images/folder_close.png" />
+                                {{item.Key}}({{item.Items.length}})
+                            </a>
+                            <div class="tool-bar" style="padding:0px;display:inline">
+                                <a href="javascript:void(0)" @click="deleteCatgory(item.Key)" title="删除分类用例"><img src="/images/delete.png" /></a>
+                            </div>
+                            <ul v-if="item.Show" class="lst-cases" style="padding-left:20px;">
+                                <li v-for="(c,i) in item.Items">
+                                    <input type="checkbox" v-model:value="c.Selected" />
+                                    <a href="javascript:void(0)" @click="selectItem(c)" :title="['['+c.Method+']'+c.BaseUrl+' '+c.Remark+'(测试结果:'+(c.Status?c.Status:'无')+')']">
+                                        <img v-if="c.Status==200" style="margin-top:-4px;" src="/images/teststatus_ok.png" />
+                                        <img v-if="c.Status>=400" style="margin-top:-4px;" src="/images/teststatus_error.png" />
+                                        <span v-if="c.Name">{{c.Name}}</span>
+                                        <span v-else>
+                                            ({{c.Method}}) {{c.BaseUrl}}
+                                        </span>
+                                    </a>
+                                    <div class="tool-bar" style="padding:0px;display:inline">
+                                        <a href="javascript:void(0)" @click="deleteItem(c,item,i)" title="删除"><img src="/images/delete.png" /></a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>使用有问题?</h4>
+                    <a href="https://github.com/IKende/WebApiBenchmark/issues" target="_blank">https://github.com/IKende/WebApiBenchmark/issues</a>
+                    <h4>工具好用想支持一下(微信扫一扫)</h4>
+                    <img style="width:128px;" src="images/wx_pay.png" />
+
+                </div>
+                <div style="height:200px;">
+                    <iframe src="http://www.ikende.com/leftpanel.html" style="border:none;overflow:no-display;width:100%;height:100%" scrolling="no"></iframe>
+                </div>
+            </div>
+
+            <div class="col-md-8 col">
+                <div class="c-panel" id="testSetting">
+                    <h3 class="c-panel-title"> <a href="javascript:void(0)" @click="Show=!Show">  测试 <small>运行状态:{{Result.Status}}({{Result.Progress}})</small></a> </h3>
+                    <form class="form-horizontal" :style="{display:(Show?'':'none')}">
+                        <div class="form-group form-group-sm form-inline" style="padding:10px;">
+                            <div class="col-sm-offset-0 col-sm-12">
+                                <label class="control-label">类型</label>
+                                <select v-model:value="Setting.Type" @change="typeChange" class="form-control">
+                                    <option value="time">时间(秒)</option>
+                                    <option value="total">总请求数</option>
+                                </select>
+                                <input type="number" v-model:value="Setting.Value" @change="valueChange" class="form-control" style="width:100px;" min="1" max="99999999" />
+                                <label class="control-label">用户数</label>
+                                <input type="number" v-model:value="Setting.Connections" class="form-control" @change="connectionsChange" style="width:80px;" min="1" max="1000" />
+
+                                <button v-if="Result.Status !='Runing'" type="button" @click="test" class="btn btn-default btn-sm">开始</button>
+                                <button v-if="Result.Status =='Runing'" type="button" @click="stop" class="btn btn-default btn-sm">停止</button>
+                               
+
+                                <div style="width:100%;height:130px;padding:2px;display:inline-block;margin-top:10px;">
+                                    <canvas width="800" height="140" id="requestMonitorStatics" style="width:100%;height:100%;border-radius:4px;"></canvas>
+                                    <div v-if="Result.All" style="padding:0px;">
+                                        <div style="padding-bottom:6px;border-bottom-style:solid;border-bottom-color:#cecece;border-bottom-width:1px;">
+
+                                            <span class="label label-success">avg:{{Result.All.avgRps}}/rps | total:{{Result.All.value}}</span>
+                                        </div>
+                                        <div class="row" style="display:inline">
+                                            <div class="col-md-5 col">
+                                                <div id="allStatusChat" style="height: 180px;width:100%">
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-7 col">
+                                                <div id="allTimeChat" style="height: 180px;width:100%">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <table class="table" style="display:inline-block;margin-left:10px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Api</th>
+
+                                                        <th>&lt;10ms</th>
+                                                        <th>20ms</th>
+                                                        <th>50ms</th>
+                                                        <th>0.1s</th>
+                                                        <th>0.2s</th>
+                                                        <th>0.5s</th>
+                                                        <th>1s</th>
+                                                        <th>2s</th>
+                                                        <th>5s</th>
+                                                        <th>10s</th>
+                                                        <th>&gt;10s</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="item in Urls" :title="['平均并发数:'+item.All.avgRps+'|总请求数:'+item.All.value]"
+                                                        style="cursor:pointer;">
+                                                        <td>
+                                                            <b> ({{item.Method}}) {{item.Url}}</b>
+                                                            <br />
+                                                            {{item.All.value}} {{item.All.percent}}
+                                                        </td>
+
+                                                        <td :style="{ color: _delayColors[item.Latency[0].color]}">{{item.Latency[0].value}}<br />{{item.Latency[0].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[1].color]}">{{item.Latency[1].value}}<br />{{item.Latency[1].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[2].color]}">{{item.Latency[2].value}}<br />{{item.Latency[2].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[3].color]}">{{item.Latency[3].value}}<br />{{item.Latency[3].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[4].color]}">{{item.Latency[4].value}}<br />{{item.Latency[4].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[5].color]}">{{item.Latency[5].value}}<br />{{item.Latency[5].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[6].color]}">{{item.Latency[6].value}}<br />{{item.Latency[6].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[7].color]}">{{item.Latency[7].value}}<br />{{item.Latency[7].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[8].color]}">{{item.Latency[8].value}}<br />{{item.Latency[8].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[9].color]}">{{item.Latency[9].value}}<br />{{item.Latency[9].percent}}</td>
+                                                        <td :style="{ color: _delayColors[item.Latency[10].color]}">{{item.Latency[10].value}}<br />{{item.Latency[10].percent}}</td>
+
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
+                                        <div class="row" style="display:inline-block;width:100%">
+                                            <div class="col-md-8 col">
+                                                <table class="table" style="display:inline-block;margin-left:10px;width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Api</th>
+                                                            <th>2xx</th>
+                                                            <th>4xx</th>
+                                                            <th>5xx</th>
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="item in Urls" :title="['平均并发数:'+item.All.avgRps+'|总请求数:'+item.All.value]" style="cursor:pointer">
+                                                            <td>
+
+                                                                <b> ({{item.Method}}) {{item.Url}}</b>
+                                                                <br />
+                                                                {{item.All.value}} {{item.All.percent}}
+                                                            <td>
+                                                                <a :style="{color: _statsColors[item.Codes[0].color]}" href="javascript:void(0)" @click="selectUrlStatus(item,item.Codes[0])">
+                                                                    {{item.Codes[0].value}}<br />{{item.Codes[0].percent}}
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a :style="{color: _statsColors[item.Codes[1].color]}" href="javascript:void(0)" @click="selectUrlStatus(item,item.Codes[1])">
+                                                                    {{item.Codes[1].value}}<br />{{item.Codes[1].percent}}
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a :style="{color: _statsColors[item.Codes[2].color]}" href="javascript:void(0)" @click="selectUrlStatus(item,item.Codes[2])">
+                                                                    {{item.Codes[2].value}}<br />{{item.Codes[2].percent}}
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div class="col-md-4 col">
+
+
+                                                <table v-if="UrlStatusDetail.Status" class="table" style="display:inline-block;margin-left:10px;width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>状态({{UrlStatusDetail.Status.name}})</th>
+                                                            <th>数量</th>
+
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="item in UrlStatusDetail.Status.Items">
+                                                            <td>{{item.name}}</td>
+                                                            <td>{{item.value}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+
+                </div>
+
+
+                <div class="c-panel" id="editCase">
+                    <h3 class="c-panel-title"><a href="javascript:void(0)" @click="Show=!Show">编辑</a></h3>
+                    <div :style="{display:(Show?'':'none')}">
+
+                        <form class="form-horizontal" style="padding:10px;" >
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">用例名称</label>
+                                <div class="col-sm-10">
+                                    <input v-model:value="Item.Name" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">路径</label>
+                                <div class="col-sm-10">
+                                    <input v-model:value="Item.BaseUrl" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">描述</label>
+                                <div class="col-sm-10">
+                                    <input type="text" v-model:value="Item.Remark" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">分类</label>
+                                <div class="input-group col-sm-5" style="padding-left:15px;padding-right:15px;">
+                                    <input type="text" v-model:value="Item.Category" class="form-control">
+                                    <div class="input-group-btn ">
+                                        <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                                        <ul class="dropdown-menu dropdown-menu-right" style="padding:4px;">
+
+                                            <li v-for="item in Categories">
+                                                <a href="javascript:void(0)" @click="Item.Category=item.Key">{{item.Key}} </a>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">QueryString</label>
+                                <div class="col-sm-10">
+                                    <table class="table table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:200px;">名称</th>
+                                                <th>值</th>
+                                                <th style="width:25px;">
+                                                    <div class="tool-bar" style=" padding:0px;margin:0px;">
+                                                        <a href="javascript:void(0)" @click="Item.QueryString.push({Name:'',Value:''})" title="添加"><img src="/images/new.png" /></a>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(item,i) in Item.QueryString">
+                                                <td> <input type="text" v-model:value="item.Name" class="form-control input-sm"></td>
+                                                <td> <input type="text" v-model:value="item.Value" class="form-control"></td>
+                                                <td>
+                                                    <div class="tool-bar" style=" padding:0px;margin:0px;padding-top:2px;">
+                                                        <a href="javascript:void(0)" @click="Item.QueryString.splice(i,1)" title="删除"><img src="/images/delete.png" /></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">Header</label>
+                                <div class="col-sm-10">
+                                    <table class="table table-condensed">
+                                        <thead>
+                                            <tr>
+
+                                                <th style="width:200px;">名称</th>
+                                                <th>值</th>
+                                                <th style="width:25px;">
+                                                    <div class="tool-bar" style=" padding:0px;margin:0px;">
+                                                        <a href="javascript:void(0)" @click="Item.Header.push({Name:'',Value:''})" title="添加"><img src="/images/new.png" /></a>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(item,i) in Item.Header">
+                                                <td> <input type="text" v-model:value="item.Name" class="form-control input-sm"></td>
+                                                <td> <input type="text" v-model:value="item.Value" class="form-control"></td>
+                                                <td>
+                                                    <div class="tool-bar" style=" padding:0px;margin:0px;padding-top:2px;">
+
+                                                        <a href="javascript:void(0)" @click="Item.Header.splice(i,1)" title="删除"><img src="/images/delete.png" /></a>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">请求类型</label>
+                                <div class="col-sm-5">
+                                    <select v-model:value="Item.Method" class="form-control">
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="DELETE">DELETE</option>
+                                        <option value="PUT">PUT</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">内容类型</label>
+                                <div class="input-group col-sm-5" style="padding-left:15px;padding-right:15px;">
+                                    <input v-model:value="Item.ContentType" type="text" class="form-control">
+                                    <div class="input-group-btn ">
+                                        <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+                                        <ul class="dropdown-menu dropdown-menu-right" style="padding:4px;">
+                                            <li><a href="javascript:void(0)" @click="Item.ContentType='application/json'"> application/json</a></li>
+                                            <li><a href="javascript:void(0)" @click="Item.ContentType='application/x-www-form-urlencoded'"> application/x-www-form-urlencoded</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="Item.Method=='POST'|| Item.Method=='PUT'" class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label">提交内容</label>
+                                <div class="col-sm-10">
+                                    <textarea v-model:value="Item.Body" class="form-control" rows="10"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-group-sm form-inline">
+                                <div class="col-sm-offset-2 col-sm-10">
+
+                                    <button type="button" @click="save" class="btn btn-default btn-sm">保存</button>
+                                    <button type="button" @click="test" class="btn btn-default btn-sm">测试</button>
+                                </div>
+                            </div>
+                            <div v-if="TestResult" class="form-group form-group-sm">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <p>状态:{{TestResult.Code}}</p>
+                                    <pre style="display:block;white-space:pre-wrap;">{{TestResult.Header}}</pre>
+                                    <pre id="testBody" style="display:block;white-space:pre-wrap;"></pre>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+    <div class="navbar navbar-inverse navbar-fixed-bottom">
+        <div class="container" style="color:aliceblue;text-align:center;" slot="footer">
+        </div>
+    </div>
+
+    <script>
+
+        var _delayColors = ['#2B9B0C', '#20BC0F', '#36DB11', '#C2DD11', "#DB9E11", "#ED7C12", "#F25913", "#FF3F14", "#F71313", "#C91010", "#930000"];
+        var _statsColors = ['#5EADB5', '#229901', '#A3A31B', '#B5B5B5', '#F9632C'];
+
+
+        var lstCases;
+        var lstServer;
+        var editCase;
+        var uploadFile;
+        $(document).ready(function () {
+            editCase = new Vue({
+                el: '#editCase',
+                data: { Categories: [], Item: { BaseUrl: '' }, TestResult: '', Show: true },
+                methods: {
+                    save: function () {
+                        if (!this.Item.BaseUrl) {
+                            alert('请输入测试基础地址!');
+                            return;
+                        }
+                        WebApiSave(this.Item).$(function (r) {
+                            alert('数据保存成功!');
+                            lstCases.listCategory();
+                            if (r.Data != true) {
+                                var change = false;
+                                lstCases.Items.forEach(function (v) {
+                                    if (v.Key == this.Item.Category) {
+                                        v.Items.push(this.Item);
+                                        change = true;
+                                    }
+                                }.bind(this));
+                                if (change == false) {
+                                    var data = { Key: this.Item.Category, Show: true, Items: [] };
+                                    data.Items.push(this.Item);
+                                    lstCases.Items.push(data);
+                                }
+                            }
+                        }.bind(this));
+                    },
+                    listCategory: function () {
+                        WebApiListCategory().$(function (r) {
+                            this.Categories = r.Data;
+                        }.bind(this));
+                    },
+                    test: function () {
+                        if (!lstServer.select) {
+                            alert('请选择测试的服务器!');
+                            return;
+                        }
+                        if (!this.Item.BaseUrl) {
+                            alert('请输入测试基础地址!');
+                            return;
+                        }
+
+                        WebApiTestCase(this.Item, lstServer.select).$(function (r) {
+                            this.TestResult = r.Data;
+                            setTimeout(this.getbody, 500);
+                        }.bind(this));
+
+                    },
+                    getbody: function () {
+                        if (this.TestResult.IsJSON == true) {
+                            try {
+                                var data = JSON.parse(this.TestResult.Body);
+                                $('#testBody').html(JSON.stringify(data, null, 4));
+                            }
+                            catch{
+                                $('#testBody').html(this.TestResult.Body);
+                            }
+
+                        }
+                        else {
+                            $('#testBody').html(this.TestResult.Body);
+                        }
+                    },
+                    get: function (item) {
+                        this.listCategory();
+                        this.TestResult = null;
+                        this.Show = true;
+                        this.Item = item;
+                    },
+                    create: function () {
+                        this.listCategory();
+                        this.TestResult = null;
+                        this.Show = true;
+
+                        WebApiCreate().$(function (r) {
+                            this.Item = r.Data;
+                        }.bind(this));
+                    }
+                }
+            });
+            lstCases = new Vue({
+                el: '#lstCases',
+                data: {
+                    Categories: [], SelectCategory: '', Items: []
+                },
+                methods: {
+                    create: function () {
+                        editCase.create();
+                    },
+                    list: function () {
+                        WebApiList(this.SelectCategory).$(function (r) {
+                            this.Items = r.Data;
+                        }.bind(this));
+                    },
+                    listCategory: function () {
+                        WebApiListCategory().$(function (r) {
+                            this.Categories = r.Data;
+                        }.bind(this));
+                    },
+                    deleteCatgory: function (category) {
+                        if (confirm('是否要删除相关分类的用例?')) {
+                            WebApiDeleteWithCategory(category).$(function (r) {
+                                this.listCategory();
+                                this.list();
+                            }.bind(this));
+                        }
+                    },
+                    selectItem: function (item) {
+
+                        editCase.get(item);
+                    },
+                    deleteItem: function (item, categories, index) {
+                        if (confirm('是否要删除测试用例?')) {
+                            WebApiDelete(item.ID).$(function (r) {
+                                if (item.ID == editCase.Item.ID) {
+                                    editCase.create();
+                                };
+                                this.listCategory();
+                                //  this.list();
+                                categories.Items.splice(index, 1);
+                            }.bind(this));
+                        }
+                    },
+                    categorySelect: function (item) {
+                        item.Items.forEach(function (v) {
+                            v.Selected = item.Selected;
+                        });
+                    },
+                    test: function () {
+                        testSetting.listServers();
+                        var items = this.selectCases();
+                        if (items.length == 0) {
+                            alert("请选择压力测试的用例!");
+                            return;
+                        }
+
+                        //testSetting.Urls = [];
+                        testSetting.Show = true;
+                        testSetting.testStatus();
+                        testSetting.createMonter();
+
+
+                        //
+
+                    },
+                    selectCases: function () {
+                        var items = [];
+                        this.Items.forEach(function (v) {
+                            v.Items.forEach(function (i) {
+                                if (i.Selected)
+                                    items.push(i.ID);
+                            });
+                        });
+                        return items;
+                    },
+                    unitTest: function () {
+                        var items = this.selectCases();
+                        if (items.length == 0) {
+                            alert("请选择单元测试的用例!");
+                            return;
+                        }
+                        if (!lstServer.select) {
+                            alert("请选择测试的服务器!");
+                            return;
+                        }
+                        this.unitTestRun(items, 0);
+                    },
+                    unitTestRun: function (items, index) {
+                        WebApiUnitTest(items[index], lstServer.select).$(function (r) {
+                            this.Items.forEach(function (v) {
+                                v.Items.forEach(function (i) {
+                                    if (i.ID == items[index]) {
+                                        i.Status = r.Data;
+                                    }
+                                });
+                            });
+                            index++;
+                            if (items.length > index) {
+                                this.unitTestRun(items, index);
+                            }
+                            else {
+                                var nitems = [];
+                                this.Items.forEach(function (v) {
+                                    nitems.push(v);
+                                });
+                                this.Items = nitems;
+                            }
+
+                        }.bind(this));
+                    }
+
+                }
+            });
+            lstServer = new Vue({
+                el: '#lstServer',
+                data: {
+                    newServer: '', Items: [], select: ''
+                },
+                methods: {
+                    create: function () {
+                        if (!this.newServer) {
+                            alert('请输入服务地址！');
+                            return;
+                        }
+                        var _this = this;
+                        WebApiAddServer(_this.newServer).$(function (r) {
+                            this.newServer = '';
+                            this.list();
+                        }.bind(this));
+
+                    },
+                    del: function (item) {
+                        if (confirm('是否要删除服务地址？')) {
+                            WebApiDelServer(item).$(function (r) {
+                                this.list();
+                            }.bind(this));
+                        }
+                    }
+                    ,
+                    list: function () {
+
+                        WebApiListServer().$(function (r) {
+                            this.Items = r.Data;
+                        }.bind(this));
+                    }
+                }
+            });
+
+            testSetting = new Vue({
+                el: '#testSetting',
+                data: {
+                    Setting: { Type: 'time', Value: 60, Connections: 100, Host: '' },
+
+                    Result: {}
+                    , All: {}, _2xx_Req: {}, _5xx_Req: {}, _3xx_Req: {}, _4xx_Req: {}, testMonter: {},
+                    Urls: [],
+                    Status: '',
+                    UrlStatusDetail: {},
+                    Show: false
+                },
+                methods: {
+                    createMonter: function () {
+
+                        this.testMonter = new Monitor("requestMonitorStatics");
+                        this.testMonter.xLen = 300;
+
+                        this.All = this.testMonter.create("all");
+                        this.All.maxValue = 100000;
+                        this.All.labelFormater = function (r) { return "All:" + r.lastValue + "/rps"; };
+
+                        this._2xx_Req = this.testMonter.create("2xx");
+                        this._2xx_Req.maxValue = 100000;
+                        this._2xx_Req.labelFormater = function (r) { return "2xx:" + r.lastValue + "/rps"; };
+
+                        this._5xx_Req = this.testMonter.create("5xx");
+                        this._5xx_Req.maxValue = 100000;
+                        this._5xx_Req.labelFormater = function (r) { return "5xx:" + r.lastValue + "/rps"; };
+
+                        this._3xx_Req = this.testMonter.create("3xx");
+                        this._3xx_Req.maxValue = 100000;
+                        this._3xx_Req.labelFormater = function (r) { return "3xx:" + r.lastValue + "/rps"; };
+
+                        this._4xx_Req = this.testMonter.create("4xx");
+                        this._4xx_Req.maxValue = 100000;
+                        this._4xx_Req.labelFormater = function (r) { return "4xx:" + r.lastValue + "/rps"; };
+                    },
+                    selectUrlStatus: function (item, status) {
+
+                        this.UrlStatusDetail = { Info: item, Status: status }
+
+                    },
+                    typeChange: function () {
+                        if (this.Setting.Type == 'time') {
+                            this.Setting.Value = 60;
+                        }
+                        else {
+                            this.Setting.Value = 10000;
+                        }
+                    },
+                    testStatus: function () {
+                        WebApiPerformanceTestStatus().$(function (r) {
+                            if (r.Data) {
+                                this.Status = r.Data.Status;
+                                if (r.Data.Status != 'Completed' && r.Data.Status != 'Error') {
+                                    setTimeout(this.testStatus, 2000);
+                                }
+                                else {
+
+                                    if (r.Data.Status == 'Error') {
+                                        alert(r.Data.Progress);
+                                        return;
+                                    }
+                                }
+                                if (r.Data.All.rps <= 0) {
+                                    this.Result = {};
+                                    return;
+                                }
+
+                                this.Result = r.Data;
+                                if (!this.Result.All)
+                                    return;
+                                this.All.push(this.Result.All.rps);
+                                this._2xx_Req.push(this.Result._2xx.rps);
+                                this._3xx_Req.push(this.Result._3xx.rps);
+                                this._4xx_Req.push(this.Result._4xx.rps);
+                                this._5xx_Req.push(this.Result._5xx.rps);
+                                this.testMonter.draw();
+                                this.Urls = r.Data.Urls;
+                                {
+                                    var data = [];
+                                    var v = {};
+                                    v.name = this.Result._2xx.name;
+                                    v.value = this.Result._2xx.value;
+                                    v.itemStyle = {
+                                        color: _statsColors[this.Result._2xx.color],
+                                    };
+                                    if (v.value > 0)
+                                        data.push(v);
+
+                                    v = {};
+                                    v.name = this.Result._3xx.name;
+                                    v.value = this.Result._3xx.value;
+                                    v.itemStyle = {
+                                        color: _statsColors[this.Result._3xx.color],
+                                    };
+                                    if (v.value > 0)
+                                        data.push(v);
+
+                                    v = {};
+                                    v.name = this.Result._4xx.name;
+                                    v.value = this.Result._4xx.value;
+                                    v.itemStyle = {
+                                        color: _statsColors[this.Result._4xx.color],
+                                    };
+                                    if (v.value > 0)
+                                        data.push(v);
+
+                                    v = {};
+                                    v.name = this.Result._5xx.name;
+                                    v.value = this.Result._5xx.value;
+                                    v.itemStyle = {
+                                        color: _statsColors[this.Result._5xx.color],
+                                    };
+                                    if (v.value > 0)
+                                        data.push(v);
+
+                                    var allStatusChat = echarts.init(document.getElementById("allStatusChat"));
+                                    allStatusChat.setOption({
+                                        tooltip: {
+                                            trigger: 'item',
+                                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                        },
+                                        series: [
+                                            {
+                                                name: '',
+                                                type: 'pie',
+                                                radius: [20, 40],
+                                                center: ['50%', '55%'],
+                                                data: data,
+                                                itemStyle: {
+                                                    emphasis: {
+                                                        shadowBlur: 20,
+                                                        shadowOffsetX: 10,
+                                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }, true);
+
+
+                                    this.Result.Latency.forEach(function (v) {
+                                        v.itemStyle = {
+                                            color: _delayColors[v.color],
+
+                                        };
+                                    });
+                                    var allTimeChat = echarts.init(document.getElementById("allTimeChat"));
+                                    allTimeChat.setOption({
+                                        tooltip: {
+                                            trigger: 'item',
+                                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                        },
+                                        series: [
+                                            {
+                                                name: '',
+                                                type: 'pie',
+                                                radius: [20, 40],
+                                                center: ['50%', '55%'],
+                                                data: this.Result.Latency,
+                                                itemStyle: {
+                                                    emphasis: {
+                                                        shadowBlur: 20,
+                                                        shadowOffsetX: 10,
+                                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }, true);
+                                }
+                            }
+                        }.bind(this));
+                    },
+                    stop: function () {
+                        WebApiPerformanceTestStop().$(function (r) { });
+                    },
+                    test: function () {
+                        if (!lstServer.select) {
+                            alert('请选择测试的服务器!');
+                            return;
+                        }
+                        var items = lstCases.selectCases();
+                        if (items.length == 0) {
+                            alert('请选择测试的用例!');
+                            return;
+                        }
+                        this.Setting.Host = lstServer.select;
+                        this.UrlStatusDetail = {};
+                        this.Show = true;
+                        WebApiPerformanceTest(this.Setting, items).$(function (r) {
+                            this.Status = true;
+                            this.createMonter();
+                            this.testStatus();
+                        }.bind(this));
+
+                    },
+                    valueChange: function () {
+                        if (this.Setting.Value <= 0)
+                            this.Setting.Value = 1;
+                    },
+                    connectionsChange: function () {
+                        if (this.Setting.Connections > 2000)
+                            this.Setting.Connections = 2000;
+                        if (this.Setting.Connections <= 0)
+                            this.Setting.Connections = 1;
+                    },
+                    listServers: function () {
+                        WebApiListServer().$(function (r) {
+                            this.Servers = r.Data;
+                        }.bind(this));
+                    },
+                }
+            })
+            lstServer.list();
+            lstCases.create();
+            lstCases.listCategory();
+            lstCases.list();
+            bindUpload();
+        });
+        function uploadBlodk(result) {
+            //{ eof: _this.completed(), data: str, name: _this.name };
+            if (result.errCode) {
+                alert(result.error);
+                return;
+            }
+            WebApiUpload(result.name, result.eof, result.data).$(function (r) {
+                if (result.eof) {
+                    alert("数据导入成功!");
+                    lstCases.list();
+                    lstCases.listCategory();
+                }
+                else {
+
+                    uploadFile.ready(uploadBlodk);
+                }
+            });
+        }
+        function bindUpload() {
+            $('#importFile').change(function (evt) {
+                var file = evt.target.files[0];
+                if (file.name.indexOf('.json') >= 0) {
+                    WebApiGetFileID().$(function (r) {
+                        uploadFile = new readFileHandler(file);
+                        uploadFile.name = r.Data;
+                        uploadFile.read(uploadBlodk);
+                    });
+
+                }
+                else {
+                    alert('选择测试用例的json文件!');
+                }
+
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>

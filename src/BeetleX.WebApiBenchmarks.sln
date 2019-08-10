@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.705
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeetleX.WebApiBenchmarks", "BeetleX.WebApiBenchmarks.csproj", "{160CB2EA-B0A7-463E-B1B4-4736A6E0C277}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{160CB2EA-B0A7-463E-B1B4-4736A6E0C277}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{160CB2EA-B0A7-463E-B1B4-4736A6E0C277}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{160CB2EA-B0A7-463E-B1B4-4736A6E0C277}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{160CB2EA-B0A7-463E-B1B4-4736A6E0C277}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11D2435A-1CCF-4849-8ECE-9E940FCB29EC}
+	EndGlobalSection
+EndGlobal
