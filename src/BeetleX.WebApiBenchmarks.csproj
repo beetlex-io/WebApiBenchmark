@@ -81,7 +81,7 @@
   <ItemGroup>
     <PackageReference Include="BeetleX.FastHttpApi" Version="1.5.4.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
